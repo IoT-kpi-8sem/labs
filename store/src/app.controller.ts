@@ -1,10 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AgentMessageDto } from './dto/agent-message.dto';
+import { AppGateway } from './app.gateway';
 
 @Controller('messages')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService, 
+    private readonly ws: AppGateway
+  ) {}
 
   @Get()
   async getAll() {
@@ -18,7 +22,11 @@ export class AppController {
 
   @Post('create')
   async create(@Body() agentMessage: AgentMessageDto) {
-    return this.appService.create(agentMessage);
+    const created = await this.appService.create(agentMessage);
+
+    this.ws.server.emit('message-created', created);
+
+    return created;
   }
 
   @Put('update/:id')
