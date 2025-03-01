@@ -10,7 +10,7 @@ var fileReader = new FileDataReader();
 fileReader.StartRead();
 await foreach (var val in fileReader.Read())
 {
-    await mqttClient.PublishAsync("test", JsonSerializer.Serialize(val));
+    await mqttClient.PublishAsync("agent", JsonSerializer.Serialize(val));
     Console.WriteLine(JsonSerializer.Serialize(val));
     await Task.Delay(1000);
 }
