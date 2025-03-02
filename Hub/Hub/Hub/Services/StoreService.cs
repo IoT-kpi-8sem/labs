@@ -1,16 +1,18 @@
 ﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using Edge.Entities;
 
 namespace Hub.Services;
 
 public class StoreService
 {
-    private readonly string _connectionString;
+    private readonly string _endpoint;
     private ConcurrentQueue<ProcessedAgentData> _messages = new();
-
-    public StoreService(string connectionString)
+    private readonly HttpClient _client = new();
+    
+    public StoreService(string endpoint)
     {
-        _connectionString = connectionString;
+        _endpoint = endpoint;
         StartSaving();
     }
     
@@ -53,5 +55,8 @@ public class StoreService
     private async Task Save(IEnumerable<ProcessedAgentData> data)
     {
         Console.WriteLine("Saving");
+        var content = new StringContent(JsonSerializer.Serialize(data));
+        content.Headers.ContentType = new("application/json");
+        await _client.PostAsync(_endpoint, content);
     }
 }
