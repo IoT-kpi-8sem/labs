@@ -2,7 +2,7 @@
 using Agent.Client;
 using Agent.DataReaders;
 
-var mqttClient = new MyMqttClient("127.0.0.1", 1883, "clientId");
+var mqttClient = new MyMqttClient("host.docker.internal", 1883, "clientId");
 await mqttClient.ConnectAsync();
 Console.WriteLine("Connected!");
 

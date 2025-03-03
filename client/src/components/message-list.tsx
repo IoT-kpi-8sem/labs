@@ -26,7 +26,7 @@ export default function MessageList({ messages }: MessageListProps) {
         data={sortedMessages}
         itemContent={(_, message) => (
           <li
-            key={`${message.gps.longitude} ${message.gps.latitude}`}
+            key={`${message.gps.Lng} ${message.gps.Lat}`}
             className='p-3 border-b last:border-b-0'
           >
             <div className='flex justify-between'>
@@ -37,13 +37,13 @@ export default function MessageList({ messages }: MessageListProps) {
             </div>
             <div className='mt-1 text-sm'>
               <div>
-                GPS: {message.gps.latitude.toFixed(6)},{' '}
-                {message.gps.longitude.toFixed(6)}
+                GPS: {message.gps.Lat.toFixed(6)},{' '}
+                {message.gps.Lng.toFixed(6)}
               </div>
               <div className='text-xs text-muted-foreground'>
-                Accelerometer: x={message.accelerometer.x.toFixed(2)}, y=
-                {message.accelerometer.y.toFixed(2)}, z=
-                {message.accelerometer.z.toFixed(2)}
+                Accelerometer: x={message.accelerometer.X.toFixed(2)}, y=
+                {message.accelerometer.Y.toFixed(2)}, z=
+                {message.accelerometer.Z.toFixed(2)}
               </div>
             </div>
           </li>

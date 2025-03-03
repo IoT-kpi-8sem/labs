@@ -54,10 +54,12 @@ export default function Home() {
     });
 
     socketInstance.on('all-messages', (allMessages: AgentMessageDto[]) => {
+      console.log(allMessages)
       setMessages(allMessages);
     });
 
     socketInstance.on('message-created', (newMessage: AgentMessageDto) => {
+      console.log(newMessage)
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       handleSetActualClientsData(newMessage);
     });

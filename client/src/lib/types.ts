@@ -1,10 +1,11 @@
+import { X } from "lucide-react"
 import { z } from "zod"
 
 export const AccelerometerDto = z
   .object({
-    x: z.number(),
-    y: z.number(),
-    z: z.number(),
+    X: z.number(),
+    Y: z.number(),
+    Z: z.number(),
   })
   .strict()
 
@@ -12,8 +13,8 @@ export type AccelerometerDto = z.infer<typeof AccelerometerDto>
 
 export const GpsDto = z
   .object({
-    latitude: z.number(),
-    longitude: z.number(),
+    Lat: z.number(),
+    Lng: z.number(),
   })
   .strict()
 

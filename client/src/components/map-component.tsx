@@ -62,12 +62,12 @@ export default function MapComponent({ actualClientsData }: MapComponentProps) {
   useEffect(() => {
     if (actualClientsData.length > 0) {
       const latestMessage = actualClientsData.at(-1)!;
-      setCenter([latestMessage.gps.latitude, latestMessage.gps.longitude]);
+      setCenter([latestMessage.gps.Lat, latestMessage.gps.Lng]);
       setZoom(13); // Zoom in when we have data
 
       if (mapRef.current) {
         mapRef.current.flyTo(
-          [latestMessage.gps.latitude, latestMessage.gps.longitude],
+          [latestMessage.gps.Lat, latestMessage.gps.Lng],
           13,
           {
             duration: 2,
@@ -99,28 +99,28 @@ export default function MapComponent({ actualClientsData }: MapComponentProps) {
         />
         {Object.entries(clientGroups).map(([clientId, clientMessages]) => {
           // const positions = clientMessages.map(
-          //   (msg) => [msg.gps.latitude, msg.gps.longitude] as [number, number]
+          //   (msg) => [msg.gps.Lat, msg.gps.longitude] as [number, number]
           // );
 
           const clientColor = getClientColor(clientId);
 
           return clientMessages.map((message) => (
-            <div key={`${message.gps.latitude}-${message.gps.longitude}`}>
+            <div key={`${message.gps.Lat}-${message.gps.Lng}`}>
               <Marker
-                position={[message.gps.latitude, message.gps.longitude]}
+                position={[message.gps.Lat, message.gps.Lng]}
                 icon={getCarIcon(clientColor)}
               >
                 <Popup>
                   <div>
                     <h3 className='font-bold'>Client: {clientId}</h3>
-                    <p>Lat: {message.gps.latitude.toFixed(6)}</p>
-                    <p>Lng: {message.gps.longitude.toFixed(6)}</p>
+                    <p>Lat: {message.gps.Lat.toFixed(6)}</p>
+                    <p>Lng: {message.gps.Lng.toFixed(6)}</p>
                     <p>Time: {new Date(message.time).toLocaleString()}</p>
                     <p>
                       Accelerometer: x=
-                      {message.accelerometer.x.toFixed(2)}, y=
-                      {message.accelerometer.y.toFixed(2)}, z=
-                      {message.accelerometer.z.toFixed(2)}
+                      {message.accelerometer.X.toFixed(2)}, y=
+                      {message.accelerometer.Y.toFixed(2)}, z=
+                      {message.accelerometer.Z.toFixed(2)}
                     </p>
                   </div>
                 </Popup>

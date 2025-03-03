@@ -1,31 +1,41 @@
 import { z } from 'zod'
 
-export const AccelerometerDto = z
+export const AccelerometerSchema = z
   .object({
-    x: z.number(),
-    y: z.number(),
-    z: z.number(),
+    X: z.number(),
+    Y: z.number(),
+    Z: z.number(),
   })
   .strict()
 
-export type AccelerometerDto = z.infer<typeof AccelerometerDto>
+export type AccelerometerDto = z.infer<typeof AccelerometerSchema>
 
-export const GpsDto = z
+export const GpsSchema = z
   .object({
-    latitude: z.number(),
-    longitude: z.number(),
+    Lat: z.number(),
+    Lng: z.number(),
   })
   .strict()
   
-export type GpsDto = z.infer<typeof GpsDto>
+export type GpsDto = z.infer<typeof GpsSchema>
 
-export const AgentMessageDto = z
+export const AgentMessageSchema = z
   .object({
-    clientId: z.string(),
-    accelerometer: AccelerometerDto,
-    gps: GpsDto,
-    time: z.string().datetime()
+    ClientId: z.string(),
+    Accelerometer: AccelerometerSchema,
+    Gps: GpsSchema,
+    Time: z.string().datetime()
   })
   .strict()
 
-export type AgentMessageDto = z.infer<typeof AgentMessageDto>
+export type AgentMessageDto = z.infer<typeof AgentMessageSchema>
+
+export const HubMessageSchema = z
+  .object({
+    RoadState: z.string(),
+    AgentMessage: AgentMessageSchema,
+  })
+  .strict()
+
+export type HubMessageDto = z.infer<typeof HubMessageSchema>
+    

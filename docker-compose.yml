@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres: 
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Qwerty123
+      POSTGRES_DB: lab-2-store
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+  
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto_broker
+    ports:
+      - "1883:1883"  # MQTT порт
+      - "9001:9001"  # WebSocket порт (если требуется)
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ./Agent 
+    container_name: agent
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  edge:
+    build:
+      context: ./Edge 
+    container_name: edge
+    depends_on:
+      - mosquitto
+      - hub
+    restart: unless-stopped
+
+  hub:
+    build:
+      context: ./Hub 
+    container_name: hub
+    depends_on:
+      - store
+    restart: unless-stopped
+
+  store:
+    build:
+      context: ./store 
+    ports:
+      - "3000:3000"
+    container_name: store
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client 
+    ports:
+      - "3001:3001"
+    container_name: client
+    depends_on:
+      - store
+    restart: unless-stopped

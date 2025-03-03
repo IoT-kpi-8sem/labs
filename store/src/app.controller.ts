@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AgentMessageDto } from './dto/agent-message.dto';
+import { AgentMessageDto, HubMessageDto } from './dto/agent-message.dto';
 import { AppGateway } from './app.gateway';
 
 @Controller('messages')
@@ -21,12 +21,16 @@ export class AppController {
   }
 
   @Post('create')
-  async create(@Body() agentMessage: AgentMessageDto) {
-    const created = await this.appService.create(agentMessage);
+  async create(@Body() messages: HubMessageDto[]) {
+    for (const message of messages) {
+      console.dir(message, { depth: null });
 
-    this.ws.server.emit('message-created', created);
+      const created = await this.appService.create(message);
 
-    return created;
+      this.ws.server.emit('message-created', created);
+    }
+
+    return 'ok';
   }
 
   @Put('update/:id')

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { DbClient } from './db/prisma-client';
-import { AgentMessageDto } from './dto/agent-message.dto';
+import { AgentMessageDto, HubMessageDto } from './dto/agent-message.dto';
 
 @Injectable()
 export class AppService {
@@ -19,9 +19,14 @@ export class AppService {
     })
   }
 
-  async create(agentMessage: AgentMessageDto) {
+  async create({ AgentMessage }: HubMessageDto) {
     return this.db.agentMessage.create({
-      data: agentMessage,
+      data: {
+        gps: AgentMessage.Gps,
+        accelerometer: AgentMessage.Accelerometer,
+        clientId: AgentMessage.ClientId,
+        time: AgentMessage.Time,
+      },
     })
   }
 
