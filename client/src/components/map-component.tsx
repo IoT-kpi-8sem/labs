@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { AgentMessageDto } from '@/lib/types';
@@ -98,9 +98,9 @@ export default function MapComponent({ actualClientsData }: MapComponentProps) {
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
         {Object.entries(clientGroups).map(([clientId, clientMessages]) => {
-          // const positions = clientMessages.map(
-          //   (msg) => [msg.gps.Lat, msg.gps.longitude] as [number, number]
-          // );
+          const positions = clientMessages.map(
+            (msg) => [msg.gps.Lat, msg.gps.Lng] as [number, number]
+          );
 
           const clientColor = getClientColor(clientId);
 
@@ -127,14 +127,14 @@ export default function MapComponent({ actualClientsData }: MapComponentProps) {
               </Marker>
 
               {/* Path line */}
-              {/* {positions.length > 1 && (
+              {positions.length > 1 && (
                 <Polyline
                   positions={positions}
                   color='#3B82F6'
                   weight={3}
                   opacity={0.7}
                 />
-              )} */}
+              )}
             </div>
           ));
         })}

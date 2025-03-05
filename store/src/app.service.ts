@@ -19,13 +19,14 @@ export class AppService {
     })
   }
 
-  async create({ AgentMessage }: HubMessageDto) {
+  async create({ AgentMessage, RoadState }: HubMessageDto) {
     return this.db.agentMessage.create({
       data: {
         gps: AgentMessage.Gps,
         accelerometer: AgentMessage.Accelerometer,
         clientId: AgentMessage.ClientId,
         time: AgentMessage.Time,
+        roadState: RoadState,
       },
     })
   }
