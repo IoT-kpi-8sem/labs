@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { AgentMessageDto } from '@/lib/types';
@@ -25,6 +31,22 @@ const getCarIcon = (color: string) =>
     iconAnchor: [20, 20],
     popupAnchor: [0, -20],
   });
+
+const getRoadStateIcon = (roadState: string) => {
+  const colors = {
+    Good: 'green',
+    Bad: 'red',
+    Normal: 'yellow',
+    Ok: 'blue',
+  };
+
+  return L.divIcon({
+    className: 'custom-icon',
+    html: `<div style="background-color: ${
+      colors[roadState as keyof typeof colors] || 'gray'
+    }; width: 8px; height: 8px; border-radius: 50%;"></div>`,
+  });
+};
 
 const getClientColor = (clientId: string) => {
   const colors = [
@@ -51,9 +73,13 @@ L.Marker.prototype.options.icon = defaultIcon;
 
 interface MapComponentProps {
   actualClientsData: AgentMessageDto[];
+  allMessages: AgentMessageDto[];
 }
 
-export default function MapComponent({ actualClientsData }: MapComponentProps) {
+export default function MapComponent({
+  actualClientsData,
+  allMessages,
+}: MapComponentProps) {
   const mapRef = useRef<L.Map | null>(null);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
   const [zoom, setZoom] = useState(2);
@@ -97,6 +123,17 @@ export default function MapComponent({ actualClientsData }: MapComponentProps) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
+        {allMessages.map((message, index) => {
+          if (!message.roadState) return null;
+
+          return (
+            <Marker
+              key={index}
+              position={[message.gps.Lat, message.gps.Lng]}
+              icon={getRoadStateIcon(message.roadState)}
+            />
+          );
+        })}
         {Object.entries(clientGroups).map(([clientId, clientMessages]) => {
           const positions = clientMessages.map(
             (msg) => [msg.gps.Lat, msg.gps.Lng] as [number, number]
