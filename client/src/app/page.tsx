@@ -86,7 +86,7 @@ export default function Home() {
                 <span className='text-red-500'>Disconnected</span>
               )}
             </div>
-            <MapComponent actualClientsData={actualClientsData} />
+            <MapComponent actualClientsData={actualClientsData} allMessages={messages} />
           </div>
         </div>
 
