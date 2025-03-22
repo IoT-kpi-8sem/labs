@@ -11,18 +11,14 @@ public class FileDataReader : IDataReader, IAsyncDisposable
     private FileStream _gpsFileStream;
     private StreamReader _gpsStream;
     
+    private FileStream _speedFileStream;
+    private StreamReader _speedStream;
+    
     public void StartRead()
     {
-        // _accFileStream = File.OpenRead("./accelerometer.csv");
-        // _accStream = new StreamReader(_accFileStream);
-        // _accStream.ReadLine();
-        //
-        // _gpsFileStream = File.OpenRead("./gps.csv");
-        // _gpsStream = new StreamReader(_gpsFileStream);
-        // _gpsStream.ReadLine();
-        
         ReopenGpsFile();
         ReopenAccFile();
+        ReopenSpeedFile();
     }
 
     public void StopRead()
@@ -43,8 +39,12 @@ public class FileDataReader : IDataReader, IAsyncDisposable
             if (_gpsStream.EndOfStream)
                 ReopenGpsFile();
             
+            if (_speedStream.EndOfStream)
+                ReopenSpeedFile();
+            
             var accStr = await _accStream.ReadLineAsync();
             var gpsStr = await _gpsStream.ReadLineAsync();
+            var speedStr = await _speedStream.ReadLineAsync();
             
             var accCoords = accStr.Split(",");
             var gpsCoords = gpsStr.Split(",");
@@ -64,6 +64,7 @@ public class FileDataReader : IDataReader, IAsyncDisposable
                     Lng = float.Parse(gpsCoords[0], CultureInfo.InvariantCulture),
                     Lat = float.Parse(gpsCoords[1], CultureInfo.InvariantCulture),
                 },
+                Speed = float.Parse(speedStr, CultureInfo.InvariantCulture),
                 ClientId = "test",
                 Time = DateTime.Now,
             };
@@ -87,6 +88,15 @@ public class FileDataReader : IDataReader, IAsyncDisposable
         _gpsStream = new StreamReader(_gpsFileStream);
         _gpsStream.ReadLine();
     }
+    
+    private void ReopenSpeedFile()
+    {
+        _speedFileStream?.Dispose();
+        _speedStream?.Dispose();
+        _speedFileStream = File.OpenRead("./speed.csv");
+        _speedStream = new StreamReader(_speedFileStream);
+        _speedStream.ReadLine();
+    }
 
     public void Dispose()
     {
@@ -94,6 +104,8 @@ public class FileDataReader : IDataReader, IAsyncDisposable
         _accStream.Dispose();
         _gpsFileStream.Dispose();
         _gpsStream.Dispose();
+        _speedFileStream.Dispose();
+        _speedStream.Dispose();
     }
 
     public async ValueTask DisposeAsync()
@@ -102,6 +114,8 @@ public class FileDataReader : IDataReader, IAsyncDisposable
         await CastAndDispose(_accStream);
         await _gpsFileStream.DisposeAsync();
         await CastAndDispose(_gpsStream);
+        await _speedFileStream.DisposeAsync();
+        await CastAndDispose(_speedStream);
 
         return;
 
