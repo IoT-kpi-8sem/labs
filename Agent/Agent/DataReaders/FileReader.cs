@@ -46,25 +46,13 @@ public class FileDataReader : IDataReader, IAsyncDisposable
             var gpsStr = await _gpsStream.ReadLineAsync();
             var speedStr = await _speedStream.ReadLineAsync();
             
-            var accCoords = accStr.Split(",");
-            var gpsCoords = gpsStr.Split(",");
-            
             i++;
             j += 0.1f;
             yield return new AgentMessage()
             {
-                Accelerometer = new Accelerometer
-                {
-                    X = int.Parse(accCoords[0]),
-                    Y = int.Parse(accCoords[1]),
-                    Z = int.Parse(accCoords[2]),
-                },
-                Gps = new Gps
-                {
-                    Lng = float.Parse(gpsCoords[0], CultureInfo.InvariantCulture),
-                    Lat = float.Parse(gpsCoords[1], CultureInfo.InvariantCulture),
-                },
-                Speed = float.Parse(speedStr, CultureInfo.InvariantCulture),
+                Accelerometer = FileParser.ParseAcc(accStr),
+                Gps = FileParser.ParseGps(gpsStr),
+                Speed = FileParser.ParseSpeed(speedStr),
                 ClientId = "test",
                 Time = DateTime.Now,
             };
