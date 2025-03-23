@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edge", "Edge\Edge.csproj", "{2B51EEC5-D2E1-4331-9617-63A99AFA18F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeTests", "EdgeTests\EdgeTests.csproj", "{D1EED22A-01FA-4E99-9C12-5C2621C76BAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{2B51EEC5-D2E1-4331-9617-63A99AFA18F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B51EEC5-D2E1-4331-9617-63A99AFA18F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B51EEC5-D2E1-4331-9617-63A99AFA18F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EED22A-01FA-4E99-9C12-5C2621C76BAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EED22A-01FA-4E99-9C12-5C2621C76BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EED22A-01FA-4E99-9C12-5C2621C76BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EED22A-01FA-4E99-9C12-5C2621C76BAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

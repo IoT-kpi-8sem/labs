@@ -14,7 +14,7 @@ public class DataProcessor(AgentAdapter agentAdapter, HubAdapter hubAdapter)
         });
     }
 
-    private ProcessedAgentData ProcessMessage(AgentMessage message)
+    public static ProcessedAgentData ProcessMessage(AgentMessage message)
     {
         var defauldVal = 16000;
         var roadState = "";
