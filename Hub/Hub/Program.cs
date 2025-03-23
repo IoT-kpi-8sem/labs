@@ -8,7 +8,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton(new StoreService(builder.Configuration.GetValue<string>("StoreApiUrl")!));
+builder.Services.AddSingleton<IStoreAdapter>(new StoreAdapter(builder.Configuration.GetValue<string>("StoreApiUrl")));
+builder.Services.AddSingleton<StoreService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

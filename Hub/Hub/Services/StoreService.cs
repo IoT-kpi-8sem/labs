@@ -6,13 +6,13 @@ namespace Hub.Services;
 
 public class StoreService
 {
-    private readonly string _endpoint;
+    private readonly IStoreAdapter _store;
     private ConcurrentQueue<ProcessedAgentData> _messages = new();
     private readonly HttpClient _client = new();
     
-    public StoreService(string endpoint)
+    public StoreService(IStoreAdapter store)
     {
-        _endpoint = endpoint;
+        _store = store;
         StartSaving();
     }
     
@@ -54,9 +54,6 @@ public class StoreService
 
     private async Task Save(IEnumerable<ProcessedAgentData> data)
     {
-        Console.WriteLine("Saving");
-        var content = new StringContent(JsonSerializer.Serialize(data));
-        content.Headers.ContentType = new("application/json");
-        await _client.PostAsync(_endpoint, content);
+        await _store.Save(data);
     }
 }
