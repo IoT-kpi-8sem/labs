@@ -26,6 +26,7 @@ export const AgentMessageDto = z
     accelerometer: AccelerometerDto,
     gps: GpsDto,
     time: z.string().datetime(),
+    speed: z.number(),
     roadState: z.string(),
   })
   .strict()
