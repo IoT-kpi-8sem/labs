@@ -27,6 +27,7 @@ export class AppService {
         clientId: AgentMessage.ClientId,
         time: AgentMessage.Time,
         roadState: RoadState,
+        speed: AgentMessage.Speed,
       },
     })
   }

@@ -24,7 +24,8 @@ export const AgentMessageSchema = z
     ClientId: z.string(),
     Accelerometer: AccelerometerSchema,
     Gps: GpsSchema,
-    Time: z.string().datetime()
+    Time: z.string().datetime(),
+    Speed: z.number(),
   })
   .strict()
 
