@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { AppService } from './app.service';
 import { AgentMessageDto, HubMessageDto } from './dto/agent-message.dto';
 import { AppGateway } from './app.gateway';
+import { RoadStateMap } from './road-state-map';
 
 @Controller('messages')
 export class AppController {
@@ -27,7 +28,9 @@ export class AppController {
 
       const created = await this.appService.create(message);
 
-      this.ws.server.emit('message-created', created);
+      const recommendedSpeed = RoadStateMap[message.RoadState ?? 'unknown'] ?? 50;
+
+      this.ws.server.emit('message-created', { ...created, recommendedSpeed });
     }
 
     return 'ok';

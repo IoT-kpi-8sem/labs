@@ -163,6 +163,15 @@ export default function MapComponent({
                       Speed: {message.speed.toFixed(2)} km/h, Road state:{' '}
                       {message.roadState}
                     </p>
+                    <p>
+                      Recommended speed: {message.recommendedSpeed}{' '}
+                      km/h
+                    </p>
+                    <p>
+                      {message.speed > message.recommendedSpeed
+                        ? `Slow down to ${message.recommendedSpeed} km/h`
+                        : `Speed up to ${message.recommendedSpeed} km/h`}
+                    </p>
                   </div>
                 </Popup>
               </Marker>

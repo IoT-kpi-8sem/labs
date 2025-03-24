@@ -28,6 +28,7 @@ export const AgentMessageDto = z
     time: z.string().datetime(),
     speed: z.number(),
     roadState: z.string(),
+    recommendedSpeed: z.number(),
   })
   .strict()
 

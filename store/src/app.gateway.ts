@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { AppService } from './app.service';
 import { AgentMessage } from '@prisma/client';
+import { RoadStateMap } from './road-state-map';
 
 @Injectable()
 @WebSocketGateway({ cors: true })
@@ -37,7 +38,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.logger.log(`Sending ${messages.length} messages to client`);
 
-    this.server.emit('all-messages', messages);
+    this.server.emit('all-messages', messages.map((msg) => {
+      const recommendedSpeed: number = RoadStateMap[msg.roadState ?? 'unknown'] ?? 50;
+
+      return { ...msg, recommendedSpeed };
+    }));
   }
 
   @SubscribeMessage('create')
@@ -46,7 +51,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: AgentMessage,
   ) {
     this.logger.log('Client requested to create a message');
+    
+    const recommendedSpeed: number = RoadStateMap[message.roadState ?? 'unknown'] ?? 50;
 
-    this.server.emit('message-created', message);
+    this.server.emit('message-created', { ...message, recommendedSpeed });
   }
 }
