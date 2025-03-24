@@ -159,6 +159,10 @@ export default function MapComponent({
                       {message.accelerometer.Y.toFixed(2)}, z=
                       {message.accelerometer.Z.toFixed(2)}
                     </p>
+                    <p>
+                      Speed: {message.speed.toFixed(2)} km/h, Road state:{' '}
+                      {message.roadState}
+                    </p>
                   </div>
                 </Popup>
               </Marker>
