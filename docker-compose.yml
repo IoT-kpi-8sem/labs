@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  postgres: 
+  postgres:
     image: postgres:16
-    container_name: postgres
+    container_name: pg
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Qwerty123
@@ -13,7 +13,7 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-  
+
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto_broker
@@ -27,7 +27,7 @@ services:
 
   agent:
     build:
-      context: ./Agent 
+      context: ./Agent
     container_name: agent
     depends_on:
       - mosquitto
@@ -35,7 +35,7 @@ services:
 
   edge:
     build:
-      context: ./Edge 
+      context: ./Edge
     container_name: edge
     depends_on:
       - mosquitto
@@ -44,7 +44,7 @@ services:
 
   hub:
     build:
-      context: ./Hub 
+      context: ./Hub
     container_name: hub
     depends_on:
       - store
@@ -52,7 +52,7 @@ services:
 
   store:
     build:
-      context: ./store 
+      context: ./store
     ports:
       - "3000:3000"
     container_name: store
@@ -62,10 +62,73 @@ services:
 
   client:
     build:
-      context: ./client 
+      context: ./client
     ports:
       - "3001:3001"
     container_name: client
     depends_on:
       - store
     restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    container_name: prometheus
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    depends_on:
+      - store
+      - hub
+      - edge
+      - agent
+      - mosquitto-exporter
+      - postgres-exporter
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3002:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  mosquitto-exporter:
+    image: sapcc/mosquitto-exporter:0.8.0
+    container_name: mosquitto-exporter
+    environment:
+      BROKER_ENDPOINT: tcp://mosquitto:1883
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.16.0
+    container_name: postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: postgresql://postgres:Qwerty123@postgres:5432/lab-2-store?sslmode=disable
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:

@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN npm ci --force
+RUN npm install --force
 RUN npm run build
 
 FROM public.ecr.aws/docker/library/node:lts-alpine
@@ -16,6 +16,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/tsconfig.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
 
-RUN npm ci --force
+RUN npm install --force
 
 CMD [ "npm", "run", "start:prod" ]

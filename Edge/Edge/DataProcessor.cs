@@ -1,5 +1,7 @@
-﻿using Edge.Adapters;
+using System.Diagnostics;
+using Edge.Adapters;
 using Edge.Entities;
+using Edge.Metrics;
 
 namespace Edge;
 
@@ -9,7 +11,13 @@ public class DataProcessor(AgentAdapter agentAdapter, HubAdapter hubAdapter)
     {
         await agentAdapter.StartReading(async message =>
         {
+            var sw = Stopwatch.StartNew();
             var res = ProcessMessage(message);
+            sw.Stop();
+            EdgeMetrics.ProcessingDuration.Observe(sw.Elapsed.TotalSeconds);
+            EdgeMetrics.MessagesProcessed.WithLabels(res.RoadState ?? "unknown").Inc();
+            EdgeMetrics.LastSpeed.WithLabels(message.ClientId ?? "unknown").Set(message.Speed);
+
             await hubAdapter.SendData(res);
         });
     }
@@ -22,7 +30,7 @@ public class DataProcessor(AgentAdapter agentAdapter, HubAdapter hubAdapter)
         if (val > 18000)
         {
             roadState = "Baaad";
-        } 
+        }
         else if (val > 12000)
         {
             roadState = "Bad";

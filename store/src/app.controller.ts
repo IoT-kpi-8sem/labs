@@ -3,12 +3,14 @@ import { AppService } from './app.service';
 import { AgentMessageDto, HubMessageDto } from './dto/agent-message.dto';
 import { AppGateway } from './app.gateway';
 import { RoadStateMap } from './road-state-map';
+import { MetricsService } from './metrics/metrics.service';
 
 @Controller('messages')
 export class AppController {
   constructor(
-    private readonly appService: AppService, 
-    private readonly ws: AppGateway
+    private readonly appService: AppService,
+    private readonly ws: AppGateway,
+    private readonly metrics: MetricsService,
   ) {}
 
   @Get()
@@ -29,6 +31,14 @@ export class AppController {
       const created = await this.appService.create(message);
 
       const recommendedSpeed = RoadStateMap[message.RoadState ?? 'unknown'] ?? 50;
+
+      this.metrics.observeMessage(
+        message.RoadState ?? null,
+        message.AgentMessage.ClientId,
+        message.AgentMessage.Speed,
+        recommendedSpeed,
+      );
+      this.metrics.wsMessagesTotal.inc({ event: 'message-created', direction: 'out' });
 
       this.ws.server.emit('message-created', { ...created, recommendedSpeed });
     }

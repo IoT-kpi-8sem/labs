@@ -1,6 +1,8 @@
-﻿using System.Net.Http.Json;
+using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Text.Json;
 using Edge.Entities;
+using Edge.Metrics;
 
 namespace Edge.Adapters;
 
@@ -13,6 +15,24 @@ public class HubAdapter(string endpoint)
         Console.WriteLine(data.RoadState);
         var content = new StringContent(JsonSerializer.Serialize(data));
         content.Headers.ContentType = new("application/json");
-        await _client.PostAsync(endpoint, content);
+
+        var sw = Stopwatch.StartNew();
+        var status = "ok";
+        try
+        {
+            var response = await _client.PostAsync(endpoint, content);
+            status = response.IsSuccessStatusCode ? "ok" : ((int)response.StatusCode).ToString();
+        }
+        catch
+        {
+            status = "error";
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            EdgeMetrics.HubSendDuration.WithLabels(status).Observe(sw.Elapsed.TotalSeconds);
+            EdgeMetrics.HubSendsTotal.WithLabels(status).Inc();
+        }
     }
 }

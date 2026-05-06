@@ -1,0 +1,189 @@
+{
+  "uid": "kpi-product",
+  "title": "KPI Labs — Product (Road Quality & Speed)",
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "tags": ["kpi-labs", "product"],
+  "templating": {
+    "list": [
+      {
+        "name": "client_id",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(vehicle_speed_kmh, client_id)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "piechart",
+      "title": "Road state share (last 5m)",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (road_state) (increase(road_quality_messages_total[5m]))",
+          "legendFormat": "{{road_state}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "pieType": "donut",
+        "displayLabels": ["name", "percent"],
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Messages/sec by road state",
+      "gridPos": { "x": 8, "y": 0, "w": 16, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (road_state) (rate(road_quality_messages_total[1m]))",
+          "legendFormat": "{{road_state}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 20, "stacking": { "mode": "normal" } }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Vehicle speed by client (km/h)",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "vehicle_speed_kmh{client_id=~\"$client_id\"}",
+          "legendFormat": "{{client_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocitykmh",
+          "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 10 }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Recommended speed (from road state)",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "recommended_speed_kmh{client_id=~\"$client_id\"}",
+          "legendFormat": "{{client_id}} ({{road_state}})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocitykmh",
+          "custom": { "drawStyle": "line", "lineInterpolation": "stepAfter", "fillOpacity": 5 }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Last reported speed",
+      "gridPos": { "x": 0, "y": 17, "w": 8, "h": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "vehicle_speed_kmh{client_id=~\"$client_id\"}",
+          "legendFormat": "{{client_id}}",
+          "refId": "A"
+        }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "" }, "colorMode": "background", "graphMode": "area" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocitykmh",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "heatmap",
+      "title": "Speed distribution (km/h)",
+      "gridPos": { "x": 8, "y": 17, "w": 8, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (le) (increase(vehicle_speed_distribution_kmh_bucket[1m]))",
+          "format": "heatmap",
+          "legendFormat": "{{le}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "calculate": false,
+        "yAxis": { "unit": "velocitykmh" },
+        "color": { "scheme": "Spectral", "mode": "scheme" }
+      }
+    },
+    {
+      "id": 7,
+      "type": "heatmap",
+      "title": "Actual − recommended speed (km/h)",
+      "gridPos": { "x": 16, "y": 17, "w": 8, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (le) (increase(vehicle_speed_over_recommended_kmh_bucket[1m]))",
+          "format": "heatmap",
+          "legendFormat": "{{le}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "calculate": false,
+        "yAxis": { "unit": "velocitykmh" },
+        "color": { "scheme": "RdYlGn", "mode": "scheme", "reverse": true }
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Total messages (last 5m) by road state",
+      "gridPos": { "x": 0, "y": 22, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (road_state) (increase(road_quality_messages_total[5m]))",
+          "legendFormat": "{{road_state}}",
+          "refId": "A"
+        }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "" }, "colorMode": "value", "graphMode": "none" }
+    }
+  ]
+}
